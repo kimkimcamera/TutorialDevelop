@@ -8,6 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PreRemove;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -15,6 +17,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.Data;
 
@@ -50,4 +53,14 @@ public class User {
     @Length(max=50)
     private String email;
     
+    @OneToOne(mappedBy="user")
+    private Authentication authentication;
+    
+    @PreRemove
+    @Transactional
+    private void preRemove() {
+        if (authentication!=null) {
+            authentication.setUser(null);
+        }
+    }
 }
